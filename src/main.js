@@ -9,7 +9,7 @@ const END_POINT = 'https://24.objects.htmlacademy.pro/big-trip';
 
 const filtersContainer = document.querySelector('.trip-controls__filters');
 const eventsContainer = document.querySelector('.trip-events');
-const newWaypointButtonContainer = document.querySelector('.trip-main');
+const headerContainer = document.querySelector('.trip-main');
 
 const waypointsApiService = new WaypointsApiService(END_POINT, AUTHORIZATION);
 
@@ -20,7 +20,7 @@ const eventsPresenter = new EventsPresenter({
   eventsContainer,
   tripModel,
   filterModel,
-  newWaypointButtonContainer
+  headerContainer
 });
 const filterPresenter = new FilterPresenter({filtersContainer, filterModel, tripModel});
 

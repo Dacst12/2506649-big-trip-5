@@ -55,4 +55,27 @@ const sortByPrice = (waypointA, waypointB) => {
 const isDatesEqual = (dateA, dateB) =>
   (dateA === null && dateB === null) || dayjs(dateA).isSame(dateB, 'D');
 
-export {humanizeDate, humanizeTime, formatToShortDefaultDate, formatToDefaultDate, formatToFullDate, capitalizeFirstLetter, getTimeDuration, humanizeTimeDuration, sortByDate, sortByTime, sortByPrice, isDatesEqual};
+const getTripRouteIds = (waypoints) =>
+  Array.from(new Set(waypoints.map(({destination}) => destination)));
+
+const getTripDuration = (waypoints) => {
+  const startDate = waypoints[0].dateFrom;
+  const endDate = waypoints.at(-1).dateTo;
+
+  const formattedStartDate = dayjs(startDate).isSame(endDate, 'M') ? formatDate(startDate, 'D') :
+    formatDate(startDate, 'D MMM');
+  const formattedEndDate = formatDate(endDate, 'D MMM');
+
+  return [formattedStartDate, formattedEndDate];
+};
+
+const getTotalBasePrice = (waypoints) => waypoints.reduce((totalPrice, currentWaypoint) =>
+  totalPrice + currentWaypoint.basePrice, 0);
+
+const getPriceByOfferId = (offerId, offers) => offers.find(({id}) => id === offerId).price;
+
+const getWaypointAddOptionalPrice = (waypoint, offers) =>
+  waypoint.offers.reduce((totalPrice, currentOfferId) =>
+    totalPrice + getPriceByOfferId(currentOfferId, offers.offers), 0);
+
+export {humanizeDate, humanizeTime, formatToShortDefaultDate, formatToDefaultDate, formatToFullDate, capitalizeFirstLetter, getTimeDuration, humanizeTimeDuration, sortByDate, sortByTime, sortByPrice, isDatesEqual, getTripRouteIds, getTripDuration, getTotalBasePrice, getWaypointAddOptionalPrice};
