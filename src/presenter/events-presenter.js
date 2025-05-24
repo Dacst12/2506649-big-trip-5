@@ -1,23 +1,24 @@
-import {remove, render} from '../framework/render.js';
+import {remove, render, RenderPosition} from '../framework/render.js';
 import SortingView from '../view/sorting.js';
 import EventsListView from '../view/events-list.js';
 import NoWaypointsView from '../view/no-waypoints.js';
 import WaypointPresenter from './waypoint-presenter.js';
 import {FilterType, NewWaypointButtonMode, SortType, TimeLimit, UpdateType, UserAction}
   from '../const.js';
-import {sortByDate, sortByPrice, sortByTime} from '../utils/waypoints.js';
+import {getTotalBasePrice, getTripDuration, getTripRouteIds, getWaypointAddOptionalPrice, sortByDate, sortByPrice, sortByTime} from '../utils/waypoints.js';
 import { filter } from '../utils/filter.js';
 import NewWaypointPresenter from './new-waypoint-presenter.js';
 import NewWaypointButton from '../view/new-waypoint-button.js';
 import LoadingView from '../view/loading.js';
 import UiBlocker from '../framework/ui-blocker/ui-blocker.js';
 import ErrorLoadingView from '../view/error-loading.js';
+import TripInfoView from '../view/trip-info.js';
 
 export default class EventsPresenter {
   #container = null;
   #tripModel = null;
   #filterModel = null;
-  #newWaypointButtonContainer = null;
+  #headerContainer = null;
 
   #sortingComponent = null;
   #noWaypointsComponent = null;
@@ -25,6 +26,7 @@ export default class EventsPresenter {
   #newWaypointButtonComponent = null;
   #loadingComponent = new LoadingView();
   #errorLoadingComponent = new ErrorLoadingView();
+  #tripInfoComponent = null;
 
   #NewWaypointButtonMode = NewWaypointButtonMode.ENABLED;
 
@@ -40,11 +42,11 @@ export default class EventsPresenter {
     upperLimit: TimeLimit.UPPER_LIMIT
   });
 
-  constructor({eventsContainer: container, tripModel, filterModel, newWaypointButtonContainer}) {
+  constructor({eventsContainer: container, tripModel, filterModel, headerContainer}) {
     this.#container = container;
     this.#tripModel = tripModel;
     this.#filterModel = filterModel;
-    this.#newWaypointButtonContainer = newWaypointButtonContainer;
+    this.#headerContainer = headerContainer;
 
     this.#tripModel.addObserver(this.#handleModelEvent);
     this.#filterModel.addObserver(this.#handleModelEvent);
@@ -163,6 +165,7 @@ export default class EventsPresenter {
 
     remove(this.#sortingComponent);
     remove(this.#noWaypointsComponent);
+    remove(this.#tripInfoComponent);
 
     if (resetSortType) {
       this.#currentSort = SortType.DAY;
@@ -208,7 +211,7 @@ export default class EventsPresenter {
       onClick: this.#onNewWaypointButtonClick
     });
 
-    render(this.#newWaypointButtonComponent, this.#newWaypointButtonContainer);
+    render(this.#newWaypointButtonComponent, this.#headerContainer);
   }
 
   #renderWaypoint(point, destinationsList, destination, offersList) {
@@ -272,6 +275,29 @@ export default class EventsPresenter {
     render(this.#errorLoadingComponent, this.#container);
   }
 
+  #renderTripInfo() {
+    const defaultWaypoints = this.#tripModel.waypoints;
+
+    const tripRouteIds = getTripRouteIds(defaultWaypoints);
+    const tripRoute = tripRouteIds.map((destinationId) =>
+      this.#tripModel.getDestinationById(destinationId).name);
+
+    const tripDuration = getTripDuration(defaultWaypoints);
+
+    const totalBasePrice = getTotalBasePrice(defaultWaypoints);
+    const totalAddOptionalPrice = defaultWaypoints.reduce((totalPrice, currentWaypoint) => {
+      const offers = this.#tripModel.getOffersByType(currentWaypoint.type);
+      const currentWaypointAddOptionalPrice = getWaypointAddOptionalPrice(currentWaypoint, offers);
+
+      return currentWaypointAddOptionalPrice + totalPrice;
+    }, 0);
+
+    const totalCost = totalBasePrice + totalAddOptionalPrice;
+
+    this.#tripInfoComponent = new TripInfoView({tripRoute, tripDuration, totalCost});
+    render(this.#tripInfoComponent, this.#headerContainer, RenderPosition.AFTERBEGIN);
+  }
+
   #renderEvents() {
     if (this.#isError) {
       this.#renderErrorLoading();
@@ -294,7 +320,7 @@ export default class EventsPresenter {
       this.#renderNoWaypoints();
       return;
     }
-
+    this.#renderTripInfo();
     this.#renderSorting();
     this.#renderEventsList();
     this.#renderWaypoints();
