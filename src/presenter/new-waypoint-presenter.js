@@ -9,7 +9,7 @@ export default class NewWaypointPresenter {
   #destinationsList = null;
   #handleDestinationUpdate = null;
   #handleOffersUpdate = null;
-  #changeNewWaypointButtonModeAndRerender = null;
+  #handleCloseForm = null;
 
   #waypointEditComponent = null;
 
@@ -20,7 +20,7 @@ export default class NewWaypointPresenter {
     destinationsList,
     handleDestinationUpdate,
     handleOffersUpdate,
-    changeNewWaypointButtonModeAndRerender
+    handleCloseForm
   }) {
     this.#eventsListContainer = eventsListContainer;
     this.#handleWaypointsDataUpdate = handleWaypointsDataUpdate;
@@ -28,7 +28,7 @@ export default class NewWaypointPresenter {
     this.#destinationsList = destinationsList;
     this.#handleDestinationUpdate = handleDestinationUpdate;
     this.#handleOffersUpdate = handleOffersUpdate;
-    this.#changeNewWaypointButtonModeAndRerender = changeNewWaypointButtonModeAndRerender;
+    this.#handleCloseForm = handleCloseForm;
   }
 
   init() {
@@ -55,7 +55,7 @@ export default class NewWaypointPresenter {
       return;
     }
 
-    this.#changeNewWaypointButtonModeAndRerender();
+    this.#handleCloseForm();
 
     remove(this.#waypointEditComponent);
     this.#waypointEditComponent = null;

@@ -59,6 +59,7 @@ export default class EventsPresenter {
   #createWaypoint () {
     this.#currentSort = SortType.DAY;
     this.#filterModel.setFilter(UpdateType.MAJOR, FilterType.EVERYTHING);
+    remove(this.#noWaypointsComponent);
 
     this.#renderNewWaypointPresenter();
     this.#newWaypointPresenter.init();
@@ -155,6 +156,10 @@ export default class EventsPresenter {
 
   #resetWaypointsMode = () => {
     this.#waypointPresenters.forEach((waypointPresenter) => waypointPresenter.resetToDefaultWaypoint());
+
+    if (this.#newWaypointPresenter) {
+      this.#newWaypointPresenter.destroy();
+    }
   };
 
   #clearEvents({resetSortType = false} = {}) {
@@ -184,9 +189,13 @@ export default class EventsPresenter {
     return updatedOffers;
   };
 
-  #changeNewWaypointButtonModeAndRerender = () => {
+  #handleCloseForm = () => {
     this.#NewWaypointButtonMode = NewWaypointButtonMode.ENABLED;
     this.#renderNewWaypointButton();
+
+    if (!this.waypoints.length) {
+      this.#renderNoWaypoints();
+    }
   };
 
   #renderNewWaypointPresenter() {
@@ -197,7 +206,7 @@ export default class EventsPresenter {
       destinationsList: this.#tripModel.destinations,
       handleDestinationUpdate: this.#handleDestinationUpdate,
       handleOffersUpdate: this.#handleOffersUpdate,
-      changeNewWaypointButtonModeAndRerender: this.#changeNewWaypointButtonModeAndRerender
+      handleCloseForm: this.#handleCloseForm
     });
   }
 
@@ -260,7 +269,7 @@ export default class EventsPresenter {
       applySort: this.#applySort
     });
 
-    render(this.#sortingComponent, this.#container);
+    render(this.#sortingComponent, this.#container, RenderPosition.AFTERBEGIN);
   }
 
   #renderEventsList() {
@@ -316,13 +325,14 @@ export default class EventsPresenter {
     this.#NewWaypointButtonMode = NewWaypointButtonMode.ENABLED;
     this.#renderNewWaypointButton();
 
+    this.#renderEventsList();
+
     if (!this.waypoints.length) {
       this.#renderNoWaypoints();
       return;
     }
     this.#renderTripInfo();
     this.#renderSorting();
-    this.#renderEventsList();
     this.#renderWaypoints();
   }
 

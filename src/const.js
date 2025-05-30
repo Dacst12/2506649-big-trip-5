@@ -1,6 +1,5 @@
 const SHORT_DEFAULT_FORMAT = 'YYYY-MM-DD';
 const SHORT_DATE_FORMAT = 'MMM D';
-const FULL_DATE_FORMAT = 'DD/MM/YY';
 const TIME_FORMAT = 'HH:mm';
 
 const POINT_TYPES = ['taxi', 'bus', 'train', 'ship', 'drive', 'flight', 'check-in', 'sightseeing', 'restaurant'];
@@ -93,4 +92,4 @@ const TimeLimit = {
   UPPER_LIMIT: 1000,
 };
 
-export {TIME_FORMAT, FULL_DATE_FORMAT, SHORT_DATE_FORMAT, SHORT_DEFAULT_FORMAT, POINT_TYPES, CITIES, DESCRIPTIONS, OFFER_TITLES, FilterType, Mode, SortType, FormMode, UserAction, UpdateType, NoWaypointsText, NewWaypointButtonMode, Method, TimeLimit};
+export {TIME_FORMAT, SHORT_DATE_FORMAT, SHORT_DEFAULT_FORMAT, POINT_TYPES, CITIES, DESCRIPTIONS, OFFER_TITLES, FilterType, Mode, SortType, FormMode, UserAction, UpdateType, NoWaypointsText, NewWaypointButtonMode, Method, TimeLimit};

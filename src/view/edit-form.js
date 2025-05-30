@@ -1,6 +1,6 @@
 import AbstractStatefulView from '../framework/view/abstract-stateful-view.js';
 import {FormMode, POINT_TYPES} from '../const.js';
-import {formatToFullDate, humanizeTime, capitalizeFirstLetter} from '../utils/waypoints.js';
+import {capitalizeFirstLetter} from '../utils/waypoints.js';
 import { toggleArrayElement } from '../utils/common.js';
 import flatpickr from 'flatpickr';
 import he from 'he';
@@ -51,7 +51,7 @@ const createOfferTemplate = ({id, title, price}, checkedAttribute, isDisabled) =
 
 const createEditWaypointTemplate = (stateData, destinationsList, mode) => {
   const {point, offers : offersType, destination, isDisabled, isSaving, isDeleting} = stateData;
-  const {basePrice, dateFrom, dateTo, offers : offersPoint, type} = point;
+  const {basePrice, offers : offersPoint, type} = point;
   const {offers} = offersType;
   const {id, name, description, pictures} = destination;
   let textResetButton = mode === FormMode.ADDING ? 'Cancel' : 'Delete';
@@ -93,10 +93,10 @@ const createEditWaypointTemplate = (stateData, destinationsList, mode) => {
 
           <div class="event__field-group  event__field-group--time">
             <label class="visually-hidden" for="event-start-time-1">From</label>
-            <input class="event__input  event__input--time" id="event-start-time-1" type="text" name="event-start-time" value="${formatToFullDate(dateFrom)} ${humanizeTime(dateFrom)}" ${isDisabled ? 'disabled' : ''}>
+            <input class="event__input  event__input--time" id="event-start-time-1" type="text" name="event-start-time" value="" ${isDisabled ? 'disabled' : ''}>
             &mdash;
             <label class="visually-hidden" for="event-end-time-1">To</label>
-            <input class="event__input  event__input--time" id="event-end-time-1" type="text" name="event-end-time" value="${formatToFullDate(dateTo)} ${humanizeTime(dateTo)}" ${isDisabled ? 'disabled' : ''}>
+            <input class="event__input  event__input--time" id="event-end-time-1" type="text" name="event-end-time" value="" ${isDisabled ? 'disabled' : ''}>
           </div>
 
           <div class="event__field-group  event__field-group--price">
