@@ -1,12 +1,11 @@
 import dayjs from 'dayjs';
-import {SHORT_DATE_FORMAT, TIME_FORMAT, SHORT_DEFAULT_FORMAT, FULL_DATE_FORMAT} from '../const.js';
+import {SHORT_DATE_FORMAT, TIME_FORMAT, SHORT_DEFAULT_FORMAT} from '../const.js';
 
 const formatDate = (date, dateFormat) => (date ? dayjs(date).format(dateFormat) : '');
 const humanizeDate = (date) => (formatDate(date, SHORT_DATE_FORMAT));
 const humanizeTime = (date) => (formatDate(date, TIME_FORMAT));
 const formatToShortDefaultDate = (date) => (formatDate(date, SHORT_DEFAULT_FORMAT));
 const formatToDefaultDate = (date) => (formatDate(date, `${SHORT_DEFAULT_FORMAT}T${TIME_FORMAT}`));
-const formatToFullDate = (date) => (formatDate(date, FULL_DATE_FORMAT));
 
 const capitalizeFirstLetter = (word) => (String(word).charAt(0).toUpperCase() + String(word).slice(1));
 
@@ -27,7 +26,7 @@ const humanizeTimeDuration = (dateFrom, dateTo) => {
   const hours = countHours >= 10 ? `${countHours}H` : `0${countHours}H`;
   const minutes = countMinutes >= 10 ? `${countMinutes}M` : `0${countMinutes}M`;
 
-  const timeDuration = `${countDays ? days : ''} ${countHours ? hours : ''} ${countMinutes ? minutes : ''}`;
+  const timeDuration = `${countDays ? days : ''} ${hours} ${minutes}`;
   return timeDuration;
 };
 
@@ -59,14 +58,13 @@ const getTripRouteIds = (waypoints) =>
   Array.from(new Set(waypoints.map(({destination}) => destination)));
 
 const getTripDuration = (waypoints) => {
-  const startDate = waypoints[0].dateFrom;
-  const endDate = waypoints.at(-1).dateTo;
+  const startDate = waypoints.reduce((min, point) =>
+    (dayjs(point.dateFrom).isBefore(min) ? point.dateFrom : min), waypoints[0].dateFrom);
 
-  const formattedStartDate = dayjs(startDate).isSame(endDate, 'M') ? formatDate(startDate, 'D') :
-    formatDate(startDate, 'D MMM');
-  const formattedEndDate = formatDate(endDate, 'D MMM');
+  const endDate = waypoints.reduce((max, point) =>
+    (dayjs(point.dateTo).isAfter(max) ? point.dateTo : max), waypoints[0].dateTo);
 
-  return [formattedStartDate, formattedEndDate];
+  return [formatDate(startDate, 'D MMM'), formatDate(endDate, 'D MMM')];
 };
 
 const getTotalBasePrice = (waypoints) => waypoints.reduce((totalPrice, currentWaypoint) =>
@@ -78,4 +76,4 @@ const getWaypointAddOptionalPrice = (waypoint, offers) =>
   waypoint.offers.reduce((totalPrice, currentOfferId) =>
     totalPrice + getPriceByOfferId(currentOfferId, offers.offers), 0);
 
-export {humanizeDate, humanizeTime, formatToShortDefaultDate, formatToDefaultDate, formatToFullDate, capitalizeFirstLetter, getTimeDuration, humanizeTimeDuration, sortByDate, sortByTime, sortByPrice, isDatesEqual, getTripRouteIds, getTripDuration, getTotalBasePrice, getWaypointAddOptionalPrice};
+export {humanizeDate, humanizeTime, formatToShortDefaultDate, formatToDefaultDate, capitalizeFirstLetter, getTimeDuration, humanizeTimeDuration, sortByDate, sortByTime, sortByPrice, isDatesEqual, getTripRouteIds, getTripDuration, getTotalBasePrice, getWaypointAddOptionalPrice};
